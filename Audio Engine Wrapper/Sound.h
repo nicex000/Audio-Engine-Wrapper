@@ -27,7 +27,6 @@ namespace AudioEngine
 		~Sound()
 		{
 			sound->release();
-			delete sound;
 		}
 
 

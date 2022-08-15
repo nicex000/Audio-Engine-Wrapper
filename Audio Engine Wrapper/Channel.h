@@ -4,7 +4,7 @@
 #include "ErrorHandler.h"
 #include "System.h"
 #include "CustomDSP.h"
-
+#include "Sound.h"
 
 namespace AudioEngine
 {
@@ -42,7 +42,11 @@ namespace AudioEngine
 			}
 
 			delete attachedDSP;
-			delete channel;
+
+			if (ended) return;
+			Sound* sound = new Sound();
+			GetCurrentSound(*sound);
+			delete sound;
 		}
 
 
