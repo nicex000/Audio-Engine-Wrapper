@@ -22,7 +22,7 @@ namespace AudioEngine
 			BIDIRECTIONAL
 		};
 		Sound();
-		Sound(const System& system, const char* path, MODE mode, LOOP_MODE loopMode);
+		Sound(const System& system, const char* path, MODE mode, LOOP_MODE loopMode, RESULT& outResult);
 
 		~Sound()
 		{

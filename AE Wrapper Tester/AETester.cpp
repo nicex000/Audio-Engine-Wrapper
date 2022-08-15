@@ -57,6 +57,8 @@ void AETester::Update()
     ImGui::Begin("Audio Engine Wrapper Test", nullptr,
         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
 
+    static std::string errorText = "";
+
 #pragma region TopBar
     bool globalPaused, globalPauseBtn, globalStopBtn;
     system.IsMasterChannelPaused(globalPaused);
@@ -136,8 +138,18 @@ void AETester::Update()
                 ImGui::Checkbox("Stream", &stream);
                 ImGui::SameLine();
                 const bool playAudioFromCombo = ImGui::Button("Play!");
-                if (playAudioFromCombo) 
-                    PlaySong(audioList[audioIndex], loop, stream, channels[i]);
+                if (playAudioFromCombo)
+                {
+                    RESULT result = PlaySong(audioList[audioIndex], loop, stream, channels[i]);
+                    if (result == RESULT::ERR_FILE_NOT_FOUND)
+                    {
+                        errorText = "Unable to find " + std::string(audioList[audioIndex]);
+                    }
+                    else if (result == RESULT::ERR_UNSUPPORTED_FILE_TYPE)
+                    {
+                        errorText = std::string(audioList[audioIndex]) + " uses an Unsupported file format.";
+                    }
+                }
                 ImGui::PopID();
 #pragma endregion
 
@@ -155,7 +167,17 @@ void AETester::Update()
                 ImGui::SameLine();
                 const bool playAudioFromTextBox = ImGui::Button("Play!");
                 if (playAudioFromTextBox)
-                    PlaySong(path, loop2, stream2, channels[i]);
+                {
+                    RESULT result = PlaySong(path, loop2, stream2, channels[i]);
+                    if (result == RESULT::ERR_FILE_NOT_FOUND)
+                    {
+                        errorText = "Unable to find " + std::string(path);
+                    }
+                    else if (result == RESULT::ERR_UNSUPPORTED_FILE_TYPE)
+                    {
+                        errorText = std::string(path) + " uses an Unsupported file format.";
+                    }
+                }
                 ImGui::PopID();
 #pragma endregion
 
@@ -244,7 +266,12 @@ void AETester::Update()
                     ImGui::PopStyleColor(3);
                     ImGui::PopID();
                 	if (pauseBtn) channels[i]->Pause(!paused);
-                    if (stopBtn) channels[i]->Stop();
+                    if (stopBtn)
+                    {
+                        channels[i]->Stop();
+                        ImGui::EndTabItem();
+                        continue;
+                    }
                     ImGui::SameLine();
                     ImGui::Text("Status: ");
                     ImVec4 statusColor;
@@ -321,6 +348,18 @@ void AETester::Update()
 
     }
 
+    if (errorText != "")
+    {
+        bool closeBtn = true;
+        ImGui::Begin("Error", &closeBtn);
+        ImGui::Text(errorText.c_str());
+        ImGui::End();
+        if (!closeBtn)
+        {
+            errorText = "";
+        }
+    }
+
     ImGui::End();
 }
 
@@ -329,16 +368,20 @@ void AETester::AddChannel()
     channels.push_back(new Channel);
 }
 
-void AETester::PlaySong(const char* path, bool loop, bool stream, Channel* channel)
+RESULT AETester::PlaySong(const char* path, bool loop, bool stream, Channel* channel)
 {
+    RESULT result;
+
     Sound* mySound = new Sound(system, path,
         stream ? Sound::MODE::STREAM : Sound::MODE::STATIC,
-        loop ? Sound::LOOP_MODE::NORMAL : Sound::LOOP_MODE::OFF);
+        loop ? Sound::LOOP_MODE::NORMAL : Sound::LOOP_MODE::OFF, result);
 
+    if (result != RESULT::OK) return result;
+
+    result = system.PlaySound(*mySound, *channel);
+
+	if (result != RESULT::OK) return result;
 
     CustomDSP* dsp = new CustomDSP(1000);
-    system.PlaySound(*mySound, *channel);
-
-    system.LoadDSP(*channel, *dsp);
-
+	return system.LoadDSP(*channel, *dsp);
 }

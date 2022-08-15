@@ -16,12 +16,20 @@ namespace AudioEngine
 			break;
 
 
+		case FMOD_RESULT::FMOD_ERR_FILE_NOTFOUND:
+			res = RESULT::ERR_FILE_NOT_FOUND;
+			break;
+		case FMOD_RESULT::FMOD_ERR_FORMAT:
+			res = RESULT::ERR_UNSUPPORTED_FILE_TYPE;
+			break;
+
 		case FMOD_RESULT::FMOD_ERR_INVALID_HANDLE:
 			res = RESULT::ERR_INVALID_HANDLE;
 			break;
 		case FMOD_RESULT::FMOD_ERR_CHANNEL_STOLEN:
 			res = RESULT::ERR_CHANNEL_STOLEN;
 			break;
+
 		}
 
 		if (res != RESULT::OK) 

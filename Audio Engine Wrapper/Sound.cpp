@@ -5,9 +5,10 @@ AudioEngine::Sound::Sound()
 {
 }
 
-AudioEngine::Sound::Sound(const System& system, const char* path, Sound::MODE mode, LOOP_MODE loopMode)
+AudioEngine::Sound::Sound(const System& system, const char* path, Sound::MODE mode, LOOP_MODE loopMode, RESULT& outResult)
 {
-	if (system.LoadSound(path, *this, mode) == RESULT::OK)
+	outResult = system.LoadSound(path, *this, mode);
+	if (outResult == RESULT::OK)
 		SetLoopMode(loopMode);
 }
 

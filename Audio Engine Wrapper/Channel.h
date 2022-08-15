@@ -2,9 +2,7 @@
 #include "FMOD Core/inc/fmod.hpp"
 
 #include "ErrorHandler.h"
-#include "System.h"
 #include "CustomDSP.h"
-#include "Sound.h"
 
 namespace AudioEngine
 {
@@ -24,30 +22,7 @@ namespace AudioEngine
 			RIGHT
 		};
 		Channel();
-		~Channel()
-		{
-			FMOD::ChannelGroup* chGroup;
-			channel->getChannelGroup(&chGroup);
-			if (chGroup)
-			{
-				chGroup->removeDSP(attachedDSP->dsp);
-				int chCount;
-				if (chGroup->getNumChannels(&chCount) == 1)
-				{
-					FMOD::ChannelGroup* parentGroup;
-					chGroup->getParentGroup(&parentGroup);
-					if (parentGroup)
-						chGroup->release();
-				}
-			}
-
-			delete attachedDSP;
-
-			if (ended) return;
-			Sound* sound = new Sound();
-			GetCurrentSound(*sound);
-			delete sound;
-		}
+		~Channel();
 
 
 		RESULT Play(const System& system, const Sound& sound, bool startPaused = false);
