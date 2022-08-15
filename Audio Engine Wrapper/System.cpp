@@ -42,7 +42,7 @@ namespace AudioEngine
 
 	}
 
-	RESULT System::LoadDSP(Channel& channel, CustomDSP& dsp)
+	RESULT System::LoadDSP(Channel& channel, CustomDSP& dsp) const
 	{
 		FMOD::ChannelGroup* mastergroup;
 		FMOD_RESULT         result;
@@ -93,38 +93,30 @@ namespace AudioEngine
 		return result;
 	}
 
-	RESULT System::GetPlayingChannelCount(int* count)
+	RESULT System::GetPlayingChannelCount(int& count) const
 	{
-		return ERRCHECK(system->getChannelsPlaying(count));
+		return ERRCHECK(system->getChannelsPlaying(&count));
 	}
 
-	void System::ReadFile(const char* path, int16_t** buffer, unsigned int* outLength)
+	RESULT System::PauseMasterChannel(bool pause) const
 	{
-		FMOD::Sound* sound;
+		FMOD::ChannelGroup* masterChannel;
+		ERRCHECK(system->getMasterChannelGroup(&masterChannel));
+		return ERRCHECK(masterChannel->setPaused(pause));
+	}
 
-		system->createSound(path, FMOD_DEFAULT, nullptr, &sound);
-		FMOD_SOUND_FORMAT format;
-		FMOD_SOUND_TYPE type;
-		int a, b;
+	RESULT System::IsMasterChannelPaused(bool& outPause) const
+	{
+		FMOD::ChannelGroup* masterChannel;
+		ERRCHECK(system->getMasterChannelGroup(&masterChannel));
+		return ERRCHECK(masterChannel->getPaused(&outPause));
+	}
 
-		sound->getFormat(&type, &format, &a, &b);
-
-
-
-		unsigned int length, read = 0;
-		void* buf = nullptr;
-		ERRCHECK(sound->getLength(&length, FMOD_TIMEUNIT_PCMBYTES));
-		//ERRCHECK(sound->readData(buf, 10, &read));
-		*outLength = read / sizeof(int16_t);
-
-		void* buf1 = nullptr, *buf2 = nullptr;
-		unsigned int l1, l2;
-		ERRCHECK(sound->lock(0, length, &buf1, &buf2, &l1, &l2));
-		*outLength = l1/sizeof(int16_t);
-		*buffer = static_cast<int16_t*>(malloc(l1));
-		memcpy(*buffer, buf1, l1);
-		sound->unlock(buf1, buf2, l1, l2);
-		sound->release();
+	RESULT System::StopAll() const
+	{
+		FMOD::ChannelGroup* masterChannel;
+		ERRCHECK(system->getMasterChannelGroup(&masterChannel));
+		return ERRCHECK(masterChannel->stop());
 	}
 }
 

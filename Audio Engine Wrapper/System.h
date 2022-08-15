@@ -30,13 +30,14 @@ namespace AudioEngine
 		RESULT Update() const;
 
 		RESULT LoadSound(const char* path, Sound& sound, Sound::MODE mode) const;
-		RESULT LoadDSP(Channel& channel, CustomDSP& dsp);
+		RESULT LoadDSP(Channel& channel, CustomDSP& dsp) const;
 		RESULT PlaySound(const Sound& sound, Channel& channel, bool startPaused = false) const;
 
-		RESULT GetPlayingChannelCount(int* count);
+		RESULT GetPlayingChannelCount(int& count) const;
 
-		void ReadFile(const char* path, int16_t** buffer, unsigned int* outLength);
-
+		RESULT PauseMasterChannel(bool pause) const;
+		RESULT IsMasterChannelPaused(bool& outPause) const;
+		RESULT StopAll() const;
 
 	private:
 		FMOD::System* system;

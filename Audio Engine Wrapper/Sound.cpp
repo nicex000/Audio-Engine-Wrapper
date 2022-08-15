@@ -11,7 +11,7 @@ AudioEngine::Sound::Sound(const System& system, const char* path, Sound::MODE mo
 		SetLoopMode(loopMode);
 }
 
-AudioEngine::RESULT AudioEngine::Sound::GetLoopMode(LOOP_MODE& outLoopMode)
+AudioEngine::RESULT AudioEngine::Sound::GetLoopMode(LOOP_MODE& outLoopMode) const
 {
 	FMOD_MODE mode;
 	const RESULT res = ERRCHECK(sound->getMode(&mode));
@@ -27,7 +27,7 @@ AudioEngine::RESULT AudioEngine::Sound::GetLoopMode(LOOP_MODE& outLoopMode)
 	return res;
 }
 
-AudioEngine::RESULT AudioEngine::Sound::SetLoopMode(LOOP_MODE loopMode)
+AudioEngine::RESULT AudioEngine::Sound::SetLoopMode(LOOP_MODE loopMode) const
 {
 	switch (loopMode) { case LOOP_MODE::OFF: return ERRCHECK(sound->setMode(FMOD_LOOP_OFF));
 	case LOOP_MODE::NORMAL: return ERRCHECK(sound->setMode(FMOD_LOOP_NORMAL));
@@ -36,7 +36,12 @@ AudioEngine::RESULT AudioEngine::Sound::SetLoopMode(LOOP_MODE loopMode)
 	}
 }
 
-AudioEngine::RESULT AudioEngine::Sound::GetLengthInMs(unsigned* len)
+AudioEngine::RESULT AudioEngine::Sound::GetLengthInMs(unsigned& len) const
 {
-	return ERRCHECK(sound->getLength(len, FMOD_TIMEUNIT_MS));
+	return ERRCHECK(sound->getLength(&len, FMOD_TIMEUNIT_MS));
+}
+
+AudioEngine::RESULT AudioEngine::Sound::GetLengthInPCM(unsigned& len) const
+{
+	return ERRCHECK(sound->getLength(&len, FMOD_TIMEUNIT_PCM));
 }

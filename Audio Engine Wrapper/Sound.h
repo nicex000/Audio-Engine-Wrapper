@@ -31,9 +31,10 @@ namespace AudioEngine
 		}
 
 
-		RESULT GetLoopMode(LOOP_MODE& outLoopMode);
-		RESULT SetLoopMode(LOOP_MODE loopMode);
-		RESULT GetLengthInMs(unsigned int* len);
+		RESULT GetLoopMode(LOOP_MODE& outLoopMode) const;
+		RESULT SetLoopMode(LOOP_MODE loopMode) const;
+		RESULT GetLengthInMs(unsigned int& len) const;
+		RESULT GetLengthInPCM(unsigned int& len) const;
 
 
 

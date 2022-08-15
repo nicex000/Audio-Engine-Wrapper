@@ -14,28 +14,28 @@ namespace AudioEngine
 		return system.PlaySound(sound, *this, startPaused);
 	}
 
-	RESULT Channel::Stop()
+	RESULT Channel::Stop() const
 	{
 		return ERRCHECK(channel->stop());
 	}
 
-	RESULT Channel::HasEnded(bool& outIsEnded)
+	RESULT Channel::HasEnded(bool& outIsEnded) const
 	{
 		outIsEnded = ended;
 		return RESULT::OK;
 	}
 
-	RESULT Channel::SetVolume(float volume)
+	RESULT Channel::SetVolume(float volume) const
 	{
 		return ERRCHECK(channel->setVolume(volume));
 	}
 
-	RESULT Channel::GetVolume(float& outVolume)
+	RESULT Channel::GetVolume(float& outVolume) const
 	{
 		return ERRCHECK(channel->getVolume(&outVolume));
 	}
 
-	RESULT Channel::SetVolumeMode(VOLUME_MODE mode)
+	RESULT Channel::SetVolumeMode(VOLUME_MODE mode) const
 	{
 		switch (mode) { case VOLUME_MODE::INSTANT: return ERRCHECK(channel->setVolumeRamp(false));
 		case VOLUME_MODE::GRADUAL: return ERRCHECK(channel->setVolumeRamp(true));
@@ -43,7 +43,7 @@ namespace AudioEngine
 		}
 	}
 
-	RESULT Channel::GetVolumeMode(VOLUME_MODE& outMode)
+	RESULT Channel::GetVolumeMode(VOLUME_MODE& outMode) const
 	{
 		bool ramp;
 		const RESULT res = ERRCHECK(channel->getVolumeRamp(&ramp));
@@ -68,14 +68,14 @@ namespace AudioEngine
 		}
 	}
 
-	RESULT Channel::GetPan(float& outAmount, PAN_DIRECTION& outDirection)
+	RESULT Channel::GetPan(float& outAmount, PAN_DIRECTION& outDirection) const
 	{
 		outAmount = panAmount;
 		outDirection = panDirection;
 		return RESULT::OK;
 	}
 
-	RESULT Channel::IsPlaying(bool& outIsPlaying)
+	RESULT Channel::IsPlaying(bool& outIsPlaying) const
 	{
 		if (ended)
 		{
@@ -85,32 +85,37 @@ namespace AudioEngine
 		return ERRCHECK(channel->isPlaying(&outIsPlaying));
 	}
 
-	RESULT Channel::IsPaused(bool& outIsPaused)
+	RESULT Channel::IsPaused(bool& outIsPaused) const
 	{
 		return ERRCHECK(channel->getPaused(&outIsPaused));
 	}
 
-	RESULT Channel::Pause(bool pause)
+	RESULT Channel::Pause(bool pause) const
 	{
 		return ERRCHECK(channel->setPaused(pause));
 	}
 
-	RESULT Channel::SetPositionInMs(unsigned Pos)
+	RESULT Channel::SetPositionInMs(unsigned Pos) const
 	{
 		return ERRCHECK(channel->setPosition(Pos, FMOD_TIMEUNIT_MS));
 	}
 
-	RESULT Channel::GetPositionInMs(unsigned int& outPos)
+	RESULT Channel::GetPositionInMs(unsigned int& outPos) const
 	{
 		return ERRCHECK(channel->getPosition(&outPos, FMOD_TIMEUNIT_MS));
 	}
 
-	RESULT Channel::GetPositionInPCM(unsigned& outPos)
+	RESULT Channel::SetPositionInPCM(unsigned Pos) const
+	{
+		return ERRCHECK(channel->setPosition(Pos, FMOD_TIMEUNIT_PCM));
+	}
+
+	RESULT Channel::GetPositionInPCM(unsigned& outPos) const
 	{
 		return ERRCHECK(channel->getPosition(&outPos, FMOD_TIMEUNIT_PCM));
 	}
 
-	RESULT Channel::GetCurrentSound(Sound& outCurrentSound)
+	RESULT Channel::GetCurrentSound(Sound& outCurrentSound) const
 	{
 		return ERRCHECK(channel->getCurrentSound(&outCurrentSound.sound));
 	}

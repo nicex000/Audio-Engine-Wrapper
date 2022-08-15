@@ -47,24 +47,25 @@ namespace AudioEngine
 
 
 		RESULT Play(const System& system, const Sound& sound, bool startPaused = false);
-		RESULT IsPlaying(bool& outIsPlaying);
-		RESULT Pause(bool pause);
-		RESULT IsPaused(bool& outIsPaused);
-		RESULT Stop();
-		RESULT HasEnded(bool& outIsEnded);
+		RESULT IsPlaying(bool& outIsPlaying) const;
+		RESULT Pause(bool pause) const;
+		RESULT IsPaused(bool& outIsPaused) const;
+		RESULT Stop() const;
+		RESULT HasEnded(bool& outIsEnded) const;
 
-		RESULT SetVolume(float volume);
-		RESULT GetVolume(float& outVolume);
-		RESULT SetVolumeMode(VOLUME_MODE mode);
-		RESULT GetVolumeMode(VOLUME_MODE& outMode);
+		RESULT SetVolume(float volume) const;
+		RESULT GetVolume(float& outVolume) const;
+		RESULT SetVolumeMode(VOLUME_MODE mode) const;
+		RESULT GetVolumeMode(VOLUME_MODE& outMode) const;
 
 		RESULT SetPan(float amount, PAN_DIRECTION direction);
-		RESULT GetPan(float& outAmount, PAN_DIRECTION& outDirection);
+		RESULT GetPan(float& outAmount, PAN_DIRECTION& outDirection) const;
 
-		RESULT SetPositionInMs(unsigned int Pos);
-		RESULT GetPositionInMs(unsigned int& outPos);
-		RESULT GetPositionInPCM(unsigned int& outPos);
-		RESULT GetCurrentSound(Sound& outCurrentSound);
+		RESULT SetPositionInMs(unsigned int Pos) const;
+		RESULT GetPositionInMs(unsigned int& outPos) const;
+		RESULT SetPositionInPCM(unsigned int Pos) const;
+		RESULT GetPositionInPCM(unsigned int& outPos) const;
+		RESULT GetCurrentSound(Sound& outCurrentSound) const;
 
 		CustomDSP* GetDsp();
 		void UpdateDSP();

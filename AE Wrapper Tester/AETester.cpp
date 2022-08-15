@@ -57,23 +57,50 @@ void AETester::Update()
     ImGui::Begin("Audio Engine Wrapper Test", nullptr,
         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
 
+#pragma region TopBar
+    bool globalPaused, globalPauseBtn, globalStopBtn;
+    system.IsMasterChannelPaused(globalPaused);
+    ImGui::PushID(2);
+    float hue = globalPaused ? 0.3f : 0.15f;
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(hue, 0.6f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(hue, 0.7f, 0.7f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(hue, 0.8f, 0.8f));
+    globalPauseBtn = ImGui::Button(globalPaused ? "Resume All" : "Pause All");
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+    ImGui::PushID(3);
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.f, 0.6f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.f, 0.7f, 0.7f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.f, 0.8f, 0.8f));
+    globalStopBtn = ImGui::Button("Stop All");
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
 
-    bool pressed = ImGui::Button("Add Channel");
+    ImGui::SameLine();
+
+    if (globalPauseBtn) system.PauseMasterChannel(!globalPaused);
+    if (globalStopBtn) system.StopAll();
+	bool pressed = ImGui::Button("Add Channel");
     ImGui::SameLine();
     ImGui::Text("Active Channels:");
     ImGui::SameLine();
     int channelsPlaying = 0;
-    system.GetPlayingChannelCount(&channelsPlaying);
+    system.GetPlayingChannelCount(channelsPlaying);
     ImGui::Text(std::to_string(channelsPlaying).c_str());
+
     if (pressed)
     {
         AddChannel();
     }
+#pragma endregion
+
     if (ImGui::BeginTabBar("Channels", ImGuiTabBarFlags_FittingPolicyScroll))
     {
         std::vector<bool*> openedTabs;
         for (int i = 0; i < channels.size(); ++i)
         {
+
             openedTabs.push_back(new bool(true));
             if (ImGui::BeginTabItem((std::to_string(i)+ "  ").c_str(), openedTabs.back(), ImGuiTabItemFlags_None))
             {
@@ -83,17 +110,7 @@ void AETester::Update()
 	            bool         paused = 0;
 	            Sound* currentSound = new Sound;
 
-                bool hasEnded;
-                channels[i]->HasEnded(hasEnded);
-                if (!hasEnded) {
-                    channels[i]->IsPlaying(playing);
-                    channels[i]->IsPaused(paused);
-                    channels[i]->GetPositionInMs(currentPos);
-
-                    channels[i]->GetCurrentSound(*currentSound);
-
-                    currentSound->GetLengthInMs(&trackLength);
-                }
+#pragma region TrackSelectionFromList
 
                 ImGui::PushID(0);
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
@@ -122,8 +139,9 @@ void AETester::Update()
                 if (playAudioFromCombo) 
                     PlaySong(audioList[audioIndex], loop, stream, channels[i]);
                 ImGui::PopID();
+#pragma endregion
 
-
+#pragma region TrackFromDirectPath
 
                 ImGui::PushID(1);
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
@@ -139,21 +157,25 @@ void AETester::Update()
                 if (playAudioFromTextBox)
                     PlaySong(path, loop2, stream2, channels[i]);
                 ImGui::PopID();
-
-
+#pragma endregion
 
                 ImGui::NewLine();
                 ImGui::NewLine();
                 ImGui::NewLine();
 
-
-
-
-
-
+                bool hasEnded;
+                channels[i]->HasEnded(hasEnded);
 	            
                 if (!hasEnded)
                 {
+                    channels[i]->IsPlaying(playing);
+                    channels[i]->IsPaused(paused);
+                    channels[i]->GetPositionInMs(currentPos);
+                    channels[i]->GetCurrentSound(*currentSound);
+                    currentSound->GetLengthInMs(trackLength);
+
+#pragma region WaveformVisualization
+
                     static const int size = 1000;
 
                     unsigned int pcmPos = 0;
@@ -183,7 +205,9 @@ void AETester::Update()
                             ImPlot::EndPlot();
                         }
                     }
-#pragma region time_text
+#pragma endregion
+
+#pragma region Time
 
                     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
                     ImGui::ProgressBar(static_cast<float>(currentPos) / static_cast<float>(trackLength),
@@ -198,9 +222,9 @@ void AETester::Update()
 	                    trackLength / 1000 / 60,
 	                    trackLength / 1000 % 60,
 	                    trackLength / 10 % 100);
-#pragma endregion time_text
+#pragma endregion
 
-               
+#pragma region PlayPauseStop
                     bool pauseBtn, stopBtn;
 
                     ImGui::PushID(2);
@@ -234,6 +258,9 @@ void AETester::Update()
                         playing ? "Playing" :
                         "Stopped");
                     ImGui::NewLine();
+#pragma endregion
+
+#pragma region PositionVolumePanner
 
                     int pos = static_cast<int>(currentPos);
                     ImGui::PushID(5);
@@ -274,12 +301,9 @@ void AETester::Update()
 
                     channels[i]->SetPan(panVal, panDir);
 
+#pragma endregion
 
                 }
-
-
-
-
 
 	            ImGui::EndTabItem();
             }
