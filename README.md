@@ -1,5 +1,5 @@
 
-# Audio Wrapper
+# Audio Engine Wrapper
 
 A simple FMOD Core wrapper lib, with an additional example proj
 
